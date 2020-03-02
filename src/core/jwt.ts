@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { RefreshToken } from '../db/entities/RefreshToken';
 import { UserPermission  } from '../db/entities/User';
+import { Setting, SettingType } from '../core/settings';
 
 export interface ITokenPayload {
   id: number;
@@ -8,16 +9,17 @@ export interface ITokenPayload {
   permissions: UserPermission[];
 };
 
-// TODO: token expiration time should be in global config
+/** Lifetime of JWT access token in minutes */
+const tokenExpiration = Setting.create('security.jwt.lifetime', SettingType.INT, 15);
 
 const secret = process.env.SECRET;
-export const encode = (payload: ITokenPayload) => jwt.sign(payload, secret, { algorithm: 'HS256', expiresIn: '15m' });
+export const encode = async (payload: ITokenPayload) => jwt.sign(payload, secret, { algorithm: 'HS256', expiresIn: `${await tokenExpiration.get()}m` });
 export const decode = (token) => jwt.verify(token, secret, { algorithms: ['HS256'] });
 
 /** Generates access token, generates and saves refresh token to the database. */
-export const createTokenPair = async (payload: ITokenPayload, password: string) => {
-  const accessToken = encode(payload);
-  const refreshToken = RefreshToken.generate(payload.username, password);
+export const createTokenPair = async (payload: ITokenPayload) => {
+  const accessToken = await encode(payload);
+  const refreshToken = RefreshToken.generate(payload.id);
   await refreshToken.save();
 
   return {
@@ -25,5 +27,7 @@ export const createTokenPair = async (payload: ITokenPayload, password: string) 
     refresh: refreshToken.token,
   };
 };
+
+export const invalidateToken = (query: Partial<RefreshToken>) => RefreshToken.update(query, { invalidated: true });
 
 export { jwt };

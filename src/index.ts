@@ -3,10 +3,14 @@ import 'reflect-metadata';
 import { createConnection } from './db';
 import app from './app';
 import logger from './core/logger';
+import { Setting } from './core/settings';
 
 createConnection()
-  .then((connection) => {
-    logger.info('Connection to the database was established.', { database: connection.driver.database });
+  .then(async (connection) => {
+    logger.info('Connection to the database was established', { database: connection.driver.database });
+
+    await Setting.initialize(connection);
+    logger.info('Global settings were initialized');
 
     const port = process.env.PORT ?? 3000;
     app.listen(port, () => {

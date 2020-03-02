@@ -13,15 +13,12 @@ export class RefreshToken extends BaseEntity {
   invalidated: boolean;
 
   @Column()
-  username: string;
-
-  @Column()
-  password: string;
+  userId: number;
   
   @CreateDateColumn()
   createdAt: Date;
 
-  static generate(username: string, password: string): RefreshToken {
-    return RefreshToken.create({ username, password, token: uuid() });
+  static generate(userId: number): RefreshToken {
+    return RefreshToken.create({ userId, token: uuid() });
   }
 };
