@@ -1,10 +1,9 @@
-import randomString from 'crypto-random-string';
-
 import { IRequest, IResponse, IRouteDescription } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
 import { UserPermission, User } from "../../../db/entities/User";
 import { check } from "express-validator";
 import { RequestError } from '../../../util/errors';
+import { generatePassword } from '../../../util/security';
 
 interface Body {
   username: string;
@@ -33,14 +32,14 @@ export default async (req: IRequest, res: IResponse) => {
     throw new RequestError('User with given username already exists', 409); 
   }
 
-  const password = randomString({ length: 12 + Math.round(Math.random() * 6) });
-
+  const password = generatePassword();
   const user = await User.make({ 
     username, 
     password,
     permissions, 
     createdBy: req.user.id,
   });
+
   await user.save();
 
   res.status(200).json({
