@@ -1,5 +1,6 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { pick } from '../../util/object';
+import { hashPassword } from '../../util/security';
 
 export enum UserPermission {
   MANAGE_USERS = 'manage_users',
@@ -41,5 +42,23 @@ export class User extends BaseEntity {
 
   getPublicData() {
     return pick(this, ['id', 'username', 'permissions', 'createdAt']);
+  }
+
+  async getCreator() {
+    if (this.createdBy == null) { return null; }
+    return await User.findOne({ id: this.createdBy });
+  }
+
+  static async make(user: Pick<User, 'username' | 'password' | 'permissions' | 'createdBy'>) {
+    const { username, password, permissions, createdBy } = user;
+    const { hash, salt } = await hashPassword(password);
+
+    return await User.create({
+      username,
+      password: hash,
+      permissions,
+      createdBy,
+      salt,
+    });
   }
 };

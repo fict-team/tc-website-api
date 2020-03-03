@@ -1,5 +1,5 @@
 import { Setting as SettingEnt, SettingType } from '../db/entities/Setting';
-import { getConnection, Connection } from 'typeorm';
+import { Connection } from 'typeorm';
 import { isNullOrUndefined } from 'util';
 
 export { SettingType };
