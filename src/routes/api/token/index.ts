@@ -1,4 +1,4 @@
-import { IRequest, IResponse } from '../../../core/api';
+import { IRequest, IResponse, IRouteDescription } from '../../../core/api';
 import { check } from 'express-validator';
 import { User } from '../../../db/entities/User';
 import { hashPassword } from '../../../util/security';
@@ -10,10 +10,15 @@ interface Body {
   password: string;
 };
 
-export const validation = [
-  check('username').notEmpty(),
-  check('password').notEmpty(),
-];
+export const description: IRouteDescription = {
+  url: '/api/token',
+  method: 'post',
+  async: true,
+  validation: [
+    check('username').notEmpty(),
+    check('password').notEmpty(),
+  ],
+};
 
 /** POST /api/token */
 export default async (req: IRequest, res: IResponse) => {

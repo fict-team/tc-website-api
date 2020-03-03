@@ -1,30 +1,19 @@
 import express from 'express';
+import glob from 'glob';
 
 import errorHandling, { asyncHandle } from './middlewares/errorHandling';
 import requestValidation from './middlewares/requestValidation';
+import { IRouteDescription } from './core/api';
 
 const app = express();
 app.use(express.json());
 
-const routes = [
-  {
-    url: '/api/token',
-    path: './routes/api/token',
-    method: 'post',
-    async: true,
-    middlewares: [],
-  },
-  {
-    url: '/api/token/refresh',
-    path: './routes/api/token/refresh',
-    method: 'post',
-    async: true,
-  },
-];
+const routes = glob.sync(`${__dirname}/routes/**/*.js`);
 
 for (let i = 0; i < routes.length; i++) {
   const route = routes[i];
-  const { default: fn, validation } = require(route.path);
+  const { default: fn, description } = require(route);
+  const { url, validation, middlewares, async: isAsync, method } = description as IRouteDescription;
 
   let middleware = [];
 
@@ -33,11 +22,11 @@ for (let i = 0; i < routes.length; i++) {
     middleware.push(requestValidation());
   }
 
-  if (route.middlewares) {
-    middleware = middleware.concat(route.middlewares);
+  if (middlewares && middlewares.length > 0) {
+    middleware = middleware.concat(middlewares);
   }
 
-  app[route.method](route.url, ...middleware, route.async ? asyncHandle(fn): fn);
+  app[method](url, ...middleware, isAsync ? asyncHandle(fn): fn);
 }
 
 app.use(errorHandling());

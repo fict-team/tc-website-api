@@ -1,4 +1,4 @@
-import { IRequest, IResponse } from '../../../core/api';
+import { IRequest, IResponse, IRouteDescription } from '../../../core/api';
 import { check } from 'express-validator';
 import { RefreshToken } from '../../../db/entities/RefreshToken';
 import { User } from '../../../db/entities/User';
@@ -9,9 +9,14 @@ interface Body {
   refresh_token: string;
 };
 
-export const validation = [
-  check('refresh_token').notEmpty(),
-];
+export const description: IRouteDescription = {
+  url: '/api/token/refresh',
+  method: 'post',
+  async: true,
+  validation: [
+    check('refresh_token').notEmpty(),
+  ],
+};
 
 /** POST /api/token/refresh */
 export default async (req: IRequest, res: IResponse) => {

@@ -1,4 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { pick } from '../../util/object';
 
 export enum UserPermission {
   MANAGE_USERS = 'manage_users',
@@ -37,4 +38,8 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   createdBy?: number;
+
+  getPublicData() {
+    return pick(this, ['id', 'username', 'permissions', 'createdAt']);
+  }
 };
