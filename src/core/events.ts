@@ -1,5 +1,9 @@
 import { EventEmitter as Emitter } from 'events';
 
-export class EventEmitter extends Emitter {};
+export class EventEmitter<T extends string> extends Emitter {
+  on: (event: T, listener: (...args: any[]) => void) => this;
+  once: (event: T, listener: (...args: any[]) => void) => this;
+};
 
-export const core = new EventEmitter();
+type CoreEvent = "";
+export const core = new EventEmitter<CoreEvent>();

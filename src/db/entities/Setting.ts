@@ -17,6 +17,6 @@ export class Setting extends BaseEntity {
   @Column('text')
   type: SettingType;
 
-  @Column()
+  @Column({ nullable: true })
   value: string;
 };
