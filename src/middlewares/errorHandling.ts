@@ -6,7 +6,7 @@ export default () => function(err, req, res, next) {
   const details = err.details ?? [];
 
   if (status === 500) {
-    logger.error('Internal server error', { message, details });
+    logger.error('Internal server error', { msg: message, details });
   }
 
   if (!res.headersSent) {

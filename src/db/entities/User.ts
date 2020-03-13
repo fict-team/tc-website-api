@@ -41,7 +41,7 @@ export class User extends BaseEntity {
   createdBy?: number;
 
   getPublicData() {
-    return pick(this, ['id', 'username', 'permissions', 'createdAt']);
+    return pick(this, ['id', 'username', 'permissions', 'createdAt', 'updatedAt']);
   }
 
   async getCreator() {
