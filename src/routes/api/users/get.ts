@@ -30,13 +30,13 @@ export const description: IRouteDescription = {
 /** GET /api/users */
 export default async (req: IRequest, res: IResponse) => {
   const dbQuery = buildOptionalQuery(req.query, 
-    { 
+    {
       skip: v => parseInt(v), 
       take: v => parseInt(v),
-    }, 
-    { 
-      username: v => Like(v),
-      id: v => parseInt(v),
+      where: {
+        username: v => Like(v),
+        id: v => parseInt(v),
+      }
     }
   );
 

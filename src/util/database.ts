@@ -1,23 +1,19 @@
-import { FindManyOptions, FindConditions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 
-export const buildOptionalQuery = <T>(q, params, where) => {
-  const query: FindManyOptions<T> = { where: {} };
+export const buildOptionalQuery = <T>(q, params) => {
+  const query = {};
 
   Object.keys(params).forEach((k) => {
     const value = q[k];
     const fn = params[k];
+
     if (value != null) {
-      query[k] = typeof(fn) === 'function' ? fn(value) : fn; 
+      const fnType = typeof(fn);
+      if (fnType === 'function') { query[k] = fn(value); } 
+      else if (fnType === 'object') { query[k] = buildOptionalQuery(q, fn); } 
+      else { query[k] = fn; }
     }
   });
 
-  Object.keys(where).forEach((k) => {
-    const value = q[k];
-    const fn = where[k];
-    if (value != null) {
-      query.where[k] = typeof(fn) === 'function' ? fn(value) : fn; 
-    }
-  });
-
-  return query;
+  return query as FindManyOptions<T>;
 };
