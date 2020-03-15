@@ -1,4 +1,4 @@
-import { IRequest, IResponse, IRouteDescription } from "../../../core/api";
+import { IRequest, IResponse, Route, RequestMethod } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
 import { UserPermission, User } from "../../../db/entities/User";
 import { check } from "express-validator";
@@ -8,29 +8,31 @@ interface Body {
   username: string;
 }
 
-export const description: IRouteDescription = {
-  url: '/api/users',
-  method: 'delete',
-  async: true,
-  validation: [
-    check('username').isString().notEmpty(),
-  ],
-  middlewares: [authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] })],
-};
-
 /** DELETE /api/users */
-export default async (req: IRequest, res: IResponse) => {
-  const { username } = req.body as Body;
+export default class extends Route {
+  url = '/api/users';
+  method = RequestMethod.DELETE;
+  async = true;
+  validation = [
+    check('username').isString().notEmpty(),
+  ];
+  middlewares = [
+    authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
+  ];
+
+  async onRequest(req: IRequest, res: IResponse) {
+    const { username } = req.body as Body;
   
-  if (req.user.username === username) {
-    throw new RequestError('User cannot delete themself', 400);
+    if (req.user.username === username) {
+      throw new RequestError('User cannot delete themself', 400);
+    }
+
+    const result = await User.delete({ username });
+
+    if (result.affected === 0) {
+      throw new RequestError('User with given username was not found', 404);
+    }
+
+    res.status(200).send();
   }
-
-  const result = await User.delete({ username });
-
-  if (result.affected === 0) {
-    throw new RequestError('User with given username was not found', 404);
-  }
-
-  res.status(200).send();
-};
+}

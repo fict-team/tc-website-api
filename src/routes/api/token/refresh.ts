@@ -1,4 +1,4 @@
-import { IRequest, IResponse, IRouteDescription } from '../../../core/api';
+import { IRequest, IResponse, RequestMethod, Route } from '../../../core/api';
 import { check } from 'express-validator';
 import { RefreshToken } from '../../../db/entities/RefreshToken';
 import { User } from '../../../db/entities/User';
@@ -9,34 +9,35 @@ interface Body {
   refresh_token: string;
 };
 
-export const description: IRouteDescription = {
-  url: '/api/token/refresh',
-  method: 'post',
-  async: true,
-  validation: [
-    check('refresh_token').notEmpty(),
-  ],
-};
-
 /** POST /api/token/refresh */
-export default async (req: IRequest, res: IResponse) => {
-  const { refresh_token } = req.body as Body;
+export default class extends Route {
+  url = '/api/token/refresh';
+  method = RequestMethod.POST;
+  async = true;
+  validation = [
+    check('refresh_token').notEmpty(),
+  ];
 
-  const rtoken = await RefreshToken.findOne({ token: refresh_token, invalidated: false });
-  if (!rtoken) { throw new RequestError('This token is invalid or expired.', 400); }
+  async onRequest(req: IRequest, res: IResponse) {
+    const { refresh_token } = req.body as Body;
 
-  const user = await User.findOne({ id: rtoken.userId });
-  if (!user) { throw new RequestError('Token was issued to a user that does not exist now.', 404); }
+    const rtoken = await RefreshToken.findOne({ token: refresh_token, invalidated: false });
+    if (!rtoken) { throw new RequestError('This token is invalid or expired.', 400); }
 
-  await invalidateToken({ userId: user.id, invalidated: false });
+    const user = await User.findOne({ id: rtoken.userId });
+    if (!user) { throw new RequestError('Token was issued to a user that does not exist now.', 404); }
 
-  const { access, refresh } = await createTokenPair(
-    {
-      id: user.id,
-      username: user.username,
-      permissions: user.permissions,
-    }
-  );
+    await invalidateToken({ userId: user.id, invalidated: false });
 
-  res.status(200).json({ access_token: access, refresh_token: refresh });
+    const { access, refresh } = await createTokenPair(
+      {
+        id: user.id,
+        username: user.username,
+        permissions: user.permissions,
+      }
+    );
+
+    res.status(200).json({ access_token: access, refresh_token: refresh });
+  }
 };
+

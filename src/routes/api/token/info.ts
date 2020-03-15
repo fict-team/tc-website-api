@@ -1,14 +1,16 @@
-import { IRequest, IResponse, IRouteDescription } from "../../../core/api";
+import { IRequest, IResponse, RequestMethod, Route } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
 
-export const description: IRouteDescription = {
-  url: '/api/token/info',
-  method: 'get',
-  async: true,
-  middlewares: [authentication({ required: true })],
-};
+/** GET /api/token/info */
+export default class extends Route {
+  url = '/api/token/info';
+  method = RequestMethod.GET;
+  async = true;
+  middlewares = [
+    authentication({ required: true }),
+  ];
 
-/** POST /api/token/info */
-export default async (req: IRequest, res: IResponse) => {
-  res.status(200).json({ user: req.user.getPublicData() });
+  onRequest(req: IRequest, res: IResponse) {
+    res.status(200).json({ user: req.user.getPublicData() });
+  }
 };
