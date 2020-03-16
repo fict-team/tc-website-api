@@ -20,8 +20,8 @@ export default class extends Route {
     check('password').notEmpty(),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { username, password } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { username, password } = req.body;
     const user = await User.findOne({ username });
     const { hash } = await hashPassword(password, user?.salt);
     const correctPassword = user?.password === hash;

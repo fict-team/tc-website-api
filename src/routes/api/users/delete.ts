@@ -20,8 +20,8 @@ export default class extends Route {
     authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { username } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { username } = req.body;
   
     if (req.user.username === username) {
       throw new RequestError('User cannot delete themself', 400);

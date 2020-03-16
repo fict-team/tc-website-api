@@ -20,8 +20,8 @@ export default class extends Route {
     authentication({ required: true }),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { password } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { password } = req.body;
     const { hash, salt } = await hashPassword(password);
     const { user } = req;
 

@@ -26,8 +26,8 @@ export default class extends Route {
     authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { username, permissions } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { username, permissions } = req.body;
 
     if (await User.findOne({ username })) { 
       throw new RequestError('User with given username already exists', 409); 

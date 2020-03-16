@@ -1,11 +1,11 @@
-import { IRequest, IResponse, RequestMethod, Route } from "../../../core/api";
+import { IRequest, IResponse, IQueryParameters, RequestMethod, Route } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
 import { UserPermission, User } from "../../../db/entities/User";
 import { check } from "express-validator";
 import { Like } from "typeorm";
 import { buildOptionalQuery } from "../../../util/database";
 
-interface Query {
+interface Query extends IQueryParameters {
   username?: string;
   id?: string;
   skip?: string;
@@ -27,7 +27,7 @@ export default class extends Route {
     authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
+  async onRequest(req: IRequest<Query, any>, res: IResponse) {
     const dbQuery = buildOptionalQuery(req.query, 
       {
         skip: v => parseInt(v), 

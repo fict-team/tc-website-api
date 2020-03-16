@@ -18,8 +18,8 @@ export default class extends Route {
     check('refresh_token').notEmpty(),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { refresh_token } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { refresh_token } = req.body;
 
     const rtoken = await RefreshToken.findOne({ token: refresh_token, invalidated: false });
     if (!rtoken) { throw new RequestError('This token is invalid or expired.', 400); }

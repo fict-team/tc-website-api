@@ -25,8 +25,8 @@ export default class extends Route {
     authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
   ];
 
-  async onRequest(req: IRequest, res: IResponse) {
-    const { username, permissions } = req.body as Body;
+  async onRequest(req: IRequest<any, Body>, res: IResponse) {
+    const { username, permissions } = req.body;
 
     const user = await User.findOne({ username });
     if (!user) { 

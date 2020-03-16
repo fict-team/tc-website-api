@@ -4,8 +4,12 @@ import { ValidationChain } from 'express-validator';
 import { asyncHandle } from '../middlewares/errorHandling';
 import requestValidation from '../middlewares/requestValidation';
 
-export interface IRequest extends Request {
+export interface IQueryParameters { [x: string]: string };
+
+export interface IRequest<Q extends IQueryParameters = any, B = any> extends Request {
   user?: User;
+  query: Q;
+  body: B;
 };
 
 export interface IResponse extends Response {};
@@ -22,14 +26,14 @@ export enum RequestMethod {
 
 export type RouteMiddleware = (...args) => any;
 
-export class Route {
+export class Route<Q extends IQueryParameters = any, B = any> {
   public url: string;
   public method: RequestMethod;
   public middlewares?: RouteMiddleware[];
   public validation?: ValidationChain[];
   public async?: boolean;
 
-  public onRequest(req: IRequest, res: IResponse, next: NextFunction): Promise<any> | any {};
+  public onRequest(req: IRequest<Q, B>, res: IResponse, next: NextFunction): any {};
 
   public initialize(app: Express) {
     let middleware = [];
