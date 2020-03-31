@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - name: Update and Build
+    - name: Build image
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.DO_HOST }}
@@ -20,4 +20,20 @@ jobs:
          cd ./api
          ./update.sh
          ./build.sh
+         
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        password: ${{ secrets.DO_PASSWORD }}
+        port: ${{ secrets.DO_PORT }}
+        script: |
+         cd ./api
+         ./deploy.sh
+ 
        
