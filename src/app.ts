@@ -1,11 +1,13 @@
 import express from 'express';
 import glob from 'glob';
+import cors from 'cors';
 
 import errorHandling from './middlewares/errorHandling';
 import { Route } from './core/api';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const routes = glob.sync(`${__dirname}/routes/**/*.js`);
 
