@@ -47,5 +47,5 @@ createConnection()
       logger.info(`Server is listening`, { port });
     });
   })
-  .catch((err) => logger.error(`Failed to establish connection to the database`, { error: err.message ?? err.toString() }));
+  .catch((err) => console.log(err));
   

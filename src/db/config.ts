@@ -7,6 +7,7 @@ const options: ConnectionOptions = {
   username: process.env.DB_USER ?? 'postgres',
   password: process.env.DB_PASSWORD ?? 'postgres',
   database: process.env.DB_NAME ?? 'postgres',
+  schema: process.env.DB_SCHEMA ?? 'public',
   logging: process.env.LOG_LEVEL === 'debug',
   synchronize: true,
   entities: [

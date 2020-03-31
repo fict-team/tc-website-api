@@ -1,6 +1,7 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { pick } from '../../util/object';
 import { hashPassword } from '../../util/security';
+import { News } from './News';
 
 export enum UserPermission {
   MANAGE_USERS = 'manage_users',
@@ -30,6 +31,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'simple-json', default: [] })
   permissions: UserPermission[];
+
+  @OneToMany(type => News, news => news.author)
+  news: News[]
   
   @CreateDateColumn()
   createdAt: Date;
