@@ -6,12 +6,13 @@ export const buildOptionalQuery = <T>(q, params) => {
   Object.keys(params).forEach((k) => {
     const value = q[k];
     const fn = params[k];
+    const fnType = typeof(fn);
 
     if (value != null) {
-      const fnType = typeof(fn);
       if (fnType === 'function') { query[k] = fn(value); } 
-      else if (fnType === 'object') { query[k] = buildOptionalQuery(q, fn); } 
       else { query[k] = fn; }
+    } else if (fnType === 'object') {
+      query[k] = buildOptionalQuery(q, fn);
     }
   });
 
