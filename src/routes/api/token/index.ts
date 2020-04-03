@@ -30,14 +30,17 @@ export default class extends Route {
       throw new RequestError('User with given username and password was not found.', 404);
     }
 
-    await invalidateToken({ userId: user.id, invalidated: false });
+    await req.fingerprint.save();
+
+    await invalidateToken({ userId: user.id, invalidated: false, fingerprint: req.fingerprint });
 
     const { access, refresh } = await createTokenPair(
       {
         id: user.id,
         username: user.username,
         permissions: user.permissions,
-      }
+      },
+      req.fingerprint
     );
 
     res.status(200).json({ access_token: access, refresh_token: refresh });

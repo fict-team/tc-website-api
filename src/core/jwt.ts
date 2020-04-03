@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { RefreshToken } from '../db/entities/RefreshToken';
 import { UserPermission  } from '../db/entities/User';
 import { Setting, SettingType } from '../core/settings';
+import { Fingerprint } from '../db/entities/Fingerprint';
 
 export interface ITokenPayload {
   id: number;
@@ -17,9 +18,10 @@ export const encode = async (payload: ITokenPayload) => jwt.sign(payload, secret
 export const decode = (token): ITokenPayload => jwt.verify(token, secret, { algorithms: ['HS256'] }) as ITokenPayload;
 
 /** Generates access token, generates and saves refresh token to the database. */
-export const createTokenPair = async (payload: ITokenPayload) => {
+export const createTokenPair = async (payload: ITokenPayload, fingerprint: Fingerprint) => {
   const accessToken = await encode(payload);
   const refreshToken = RefreshToken.generate(payload.id);
+  refreshToken.fingerprint = fingerprint;
   await refreshToken.save();
 
   return {

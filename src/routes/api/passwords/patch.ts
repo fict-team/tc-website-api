@@ -36,7 +36,8 @@ export default class extends Route {
         id: user.id,
         username: user.username,
         permissions: user.permissions,
-      }
+      },
+      req.fingerprint
     );
 
     res.status(200).json({

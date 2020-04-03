@@ -27,14 +27,15 @@ export default class extends Route {
     const user = await User.findOne({ id: rtoken.userId });
     if (!user) { throw new RequestError('Token was issued to a user that does not exist now.', 404); }
 
-    await invalidateToken({ userId: user.id, invalidated: false });
+    await invalidateToken({ userId: user.id, invalidated: false, fingerprint: req.fingerprint });
 
     const { access, refresh } = await createTokenPair(
       {
         id: user.id,
         username: user.username,
         permissions: user.permissions,
-      }
+      },
+      req.fingerprint
     );
 
     res.status(200).json({ access_token: access, refresh_token: refresh });

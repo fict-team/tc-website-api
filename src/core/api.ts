@@ -3,11 +3,13 @@ import { User } from '../db/entities/User';
 import { ValidationChain } from 'express-validator';
 import { asyncHandle } from '../middlewares/errorHandling';
 import requestValidation from '../middlewares/requestValidation';
+import { Fingerprint } from '../db/entities/Fingerprint';
 
 export interface IQueryParameters { [x: string]: string };
 
 export interface IRequest<Q extends IQueryParameters = any, B = any> extends Request {
   user?: User;
+  fingerprint: Fingerprint;
   query: Q;
   body: B;
 };
