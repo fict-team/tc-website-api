@@ -27,7 +27,7 @@ export default class extends Route {
     const correctPassword = user?.password === hash;
 
     if (!correctPassword) {
-      throw new RequestError('User with given username and password was not found.', 404);
+      throw new RequestError('User with given username and password was not found', 404);
     }
 
     await req.fingerprint.save();

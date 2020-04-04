@@ -22,10 +22,10 @@ export default class extends Route {
     const { refresh_token } = req.body;
 
     const rtoken = await RefreshToken.findOne({ token: refresh_token, invalidated: false });
-    if (!rtoken) { throw new RequestError('This token is invalid or expired.', 400); }
+    if (!rtoken) { throw new RequestError('This token is invalid or expired', 400); }
 
     const user = await User.findOne({ id: rtoken.userId });
-    if (!user) { throw new RequestError('Token was issued to a user that does not exist now.', 404); }
+    if (!user) { throw new RequestError('Token was issued to a user that does not exist now', 404); }
 
     await invalidateToken({ userId: user.id, invalidated: false, fingerprint: req.fingerprint });
 
