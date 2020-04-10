@@ -30,7 +30,7 @@ export class Fingerprint extends BaseEntity {
   public static make(req: IRequest) {
     const useragent = req.headers['user-agent'] ?? '';
     const ip = req.ip;
-    const id = createHash('sha256').update(useragent + ip, 'utf8').digest().toString('hex');
+    const id = createHash('sha256').update(useragent, 'utf8').digest().toString('hex');
     const ua = parse(useragent);
     const { os, platform, version } = ua;
     const browser = `${ua.browser ?? 'unknown'} ${version ?? '0'}`;
