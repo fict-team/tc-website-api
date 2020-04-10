@@ -3,8 +3,10 @@ import authentication from "../../../middlewares/authentication";
 import { check } from "express-validator";
 import { hashPassword } from "../../../util/security";
 import { createTokenPair, invalidateToken } from "../../../core/jwt";
+import { RequestError } from "../../../util/errors";
 
 interface Body {
+  old_password: string;
   password: string;
 }
 
@@ -14,6 +16,7 @@ export default class extends Route {
   method = RequestMethod.PATCH;
   async = true;
   validation = [
+    check('old_password').isString().notEmpty(),
     check('password').isString().isLength({ min: 8 }),
   ];
   middlewares = [
@@ -21,9 +24,17 @@ export default class extends Route {
   ];
 
   async onRequest(req: IRequest<any, Body>, res: IResponse) {
-    const { password } = req.body;
-    const { hash, salt } = await hashPassword(password);
+    const { old_password, password } = req.body;
     const { user } = req;
+
+    const { hash: oldHash } = await hashPassword(old_password, user.salt);
+    const correctPassword = user?.password === oldHash;
+
+    if (!correctPassword) {
+      throw new RequestError('Incorrect password', 401);
+    }
+
+    const { hash, salt } = await hashPassword(password);
 
     user.password = hash;
     user.salt = salt;
