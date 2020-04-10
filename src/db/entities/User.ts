@@ -15,6 +15,11 @@ export enum UserPermission {
   EDIT_SETTINGS = 'edit_settings',
 };
 
+const permissionValues = {};
+Object.keys(UserPermission).forEach(k => permissionValues[UserPermission[k]] = true);
+
+export const isValidUserPermission = (value: string) => permissionValues[value] === true;
+
 @Entity('users')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()

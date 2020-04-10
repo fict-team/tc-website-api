@@ -1,6 +1,6 @@
 import { IRequest, IResponse, RequestMethod, Route } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
-import { UserPermission, User } from "../../../db/entities/User";
+import { UserPermission, User, isValidUserPermission } from "../../../db/entities/User";
 import { check } from "express-validator";
 import { RequestError } from '../../../util/errors';
 
@@ -21,7 +21,7 @@ export default class extends Route {
     check('permissions')
       .optional({ nullable: true })
       .isArray()
-      .custom((arr: string[]) => arr.every(v => typeof(v) === 'string' && UserPermission[v]))
+      .custom((arr: string[]) => arr.every(v => isValidUserPermission(v)))
       .withMessage('Invalid permissions'),
   ];
   middlewares = [
