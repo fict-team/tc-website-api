@@ -17,9 +17,9 @@ export default class extends Route {
   async = true;
   validation = [
     check('username').isString().notEmpty(),
-    check('email').optional().isEmail(),
+    check('email').optional({ nullable: true }).isEmail(),
     check('permissions')
-      .optional()
+      .optional({ nullable: true })
       .isArray()
       .custom((arr: string[]) => arr.every(v => typeof(v) === 'string' && UserPermission[v]))
       .withMessage('Invalid permissions'),
