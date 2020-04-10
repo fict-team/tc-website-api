@@ -12,7 +12,7 @@ export default class extends Route {
   ];
 
   async onRequest(req: IRequest<any, Body>, res: IResponse) {
-    const { user } = req;
+    const { user, fingerprint } = req;
     
     const tokens = await RefreshToken.find({
       where: {
@@ -22,7 +22,13 @@ export default class extends Route {
       relations: ['fingerprint'],
     });
 
-    const sessions = tokens.map(t => ({ fingerprint: t.fingerprint, createdAt: t.createdAt }));
+    const sessions = tokens.map(t => (
+      { 
+        fingerprint: t.fingerprint, 
+        current: fingerprint.id === t.fingerprint.id,
+        createdAt: t.createdAt 
+      }
+    ));
     res.status(200).json({ sessions });
   }
 };
