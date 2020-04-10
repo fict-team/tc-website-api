@@ -26,6 +26,9 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  email: string;
+
   @Column()
   salt: string;
 
@@ -45,7 +48,7 @@ export class User extends BaseEntity {
   createdBy?: number;
 
   getPublicData() {
-    return pick(this, ['id', 'username', 'permissions', 'createdAt', 'updatedAt']);
+    return pick(this, ['id', 'username', 'email', 'permissions', 'createdAt', 'updatedAt']);
   }
 
   async getCreator() {
@@ -53,12 +56,13 @@ export class User extends BaseEntity {
     return await User.findOne({ id: this.createdBy });
   }
 
-  static async make(user: Pick<User, 'username' | 'password' | 'permissions' | 'createdBy'>) {
-    const { username, password, permissions, createdBy } = user;
+  static async make(user: Pick<User, 'username' | 'password' | 'email' | 'permissions' | 'createdBy'>) {
+    const { username, password, permissions, createdBy, email } = user;
     const { hash, salt } = await hashPassword(password);
 
     return await User.create({
       username,
+      email,
       password: hash,
       permissions,
       createdBy,

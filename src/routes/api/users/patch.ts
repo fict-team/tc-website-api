@@ -6,7 +6,8 @@ import { RequestError } from '../../../util/errors';
 
 interface Body {
   username: string;
-  permissions: UserPermission[];
+  email?: string;
+  permissions?: UserPermission[];
 }
 
 /** PATCH /api/users */
@@ -16,7 +17,9 @@ export default class extends Route {
   async = true;
   validation = [
     check('username').isString().notEmpty(),
+    check('email').optional().isEmail(),
     check('permissions')
+      .optional()
       .isArray()
       .custom((arr: string[]) => arr.every(v => typeof(v) === 'string' && UserPermission[v]))
       .withMessage('Invalid permissions'),
@@ -26,14 +29,21 @@ export default class extends Route {
   ];
 
   async onRequest(req: IRequest<any, Body>, res: IResponse) {
-    const { username, permissions } = req.body;
+    const { username, permissions, email } = req.body;
 
     const user = await User.findOne({ username });
     if (!user) { 
       throw new RequestError('User with given username does not exist', 404); 
     }
 
-    user.permissions = permissions;
+    if (permissions != null) {
+      user.permissions = permissions;
+    }
+
+    if (email != null) {
+      user.email = email;
+    }
+
     user.updatedAt = new Date();
 
     await user.save();
@@ -42,7 +52,8 @@ export default class extends Route {
       user: {
         id: user.id,
         username,
-        permissions,
+        email: user.email,
+        permissions: user.permissions,
       },
     });
   }

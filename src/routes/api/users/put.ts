@@ -7,6 +7,7 @@ import { generatePassword } from '../../../util/security';
 
 interface Body {
   username: string;
+  email?: string;
   permissions: UserPermission[];
 }
 
@@ -17,6 +18,7 @@ export default class extends Route {
   async = true;
   validation = [
     check('username').isString().notEmpty(),
+    check('email').optional().isEmail(),
     check('permissions')
       .isArray()
       .custom((arr: string[]) => arr.every(v => typeof(v) === 'string' && UserPermission[v]))
@@ -27,7 +29,7 @@ export default class extends Route {
   ];
 
   async onRequest(req: IRequest<any, Body>, res: IResponse) {
-    const { username, permissions } = req.body;
+    const { username, permissions, email } = req.body;
 
     if (await User.findOne({ username })) { 
       throw new RequestError('User with given username already exists', 409); 
@@ -37,6 +39,7 @@ export default class extends Route {
     const user = await User.make({ 
       username, 
       password,
+      email,
       permissions, 
       createdBy: req.user.id,
     });
@@ -47,6 +50,7 @@ export default class extends Route {
       user: {
         id: user.id,
         username,
+        email,
         password,
         permissions,
       },
