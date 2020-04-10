@@ -1,9 +1,9 @@
 import { IRequest, IResponse, RequestMethod, Route } from "../../../core/api";
 import authentication from "../../../middlewares/authentication";
 
-/** GET /api/token/info */
+/** GET /api/token */
 export default class extends Route {
-  url = '/api/token/info';
+  url = '/api/token';
   method = RequestMethod.GET;
   async = true;
   middlewares = [
