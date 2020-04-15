@@ -18,10 +18,10 @@ export default class extends Route {
   method = RequestMethod.GET;
   async = true;
   validation = [
-    check('username').optional().isString().notEmpty(),
-    check('id').optional().isInt(),
-    check('offset').optional().isInt(),
-    check('limit').optional().isInt(),
+    check('username').optional({ nullable: true }).isString().notEmpty(),
+    check('id').optional({ nullable: true }).isInt(),
+    check('skip').optional({ nullable: true }).isInt(),
+    check('take').optional({ nullable: true }).isInt(),
   ];
   middlewares = [
     authentication({ required: true, permissions: [UserPermission.MANAGE_USERS] }),
